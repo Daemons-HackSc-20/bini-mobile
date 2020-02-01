@@ -8,6 +8,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.a.bini.utils.Callbacks;
+import com.a.bini.utils.NetworkUtils;
+import com.android.volley.VolleyError;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class GameActivity extends AppCompatActivity {
     private ImageView mImageViewPlayGuess;
     private Button mButtonSubmitYes;
@@ -22,10 +29,12 @@ public class GameActivity extends AppCompatActivity {
         mButtonSubmitYes = findViewById(R.id.btn_submit_answer_yes);
         mButtonSubmitNo = findViewById(R.id.btn_submit_answer_no);
 
-        setOnlickSubmitButtons();
+        setOnclickSubmitButtons();
+
+        fetchQuestion();
     }
 
-    private void setOnlickSubmitButtons() {
+    private void setOnclickSubmitButtons() {
         mButtonSubmitYes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -38,6 +47,26 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast toast=Toast.makeText(getApplicationContext(),"no",Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        });
+    }
+
+    private void fetchQuestion() {
+        NetworkUtils.fetchRandomQuestion(getApplicationContext(), new Callbacks.VolleyCallback() {
+            @Override
+            public void onSuccess(JSONObject response) {
+
+                try {
+                    String imageUri = response.getJSONObject("question").getString("image_uri");
+                } catch (JSONException e) {
+                }
+
+            }
+
+            @Override
+            public void onError(VolleyError error) {
+                Toast toast=Toast.makeText(getApplicationContext(),error.toString(),Toast.LENGTH_SHORT);
                 toast.show();
             }
         });
