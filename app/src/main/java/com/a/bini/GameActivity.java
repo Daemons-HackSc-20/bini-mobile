@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -19,9 +18,10 @@ import org.json.JSONObject;
 
 public class GameActivity extends AppCompatActivity {
     private ImageView mImageViewPlayGuess;
-    private Button mButtonSubmitYes;
-    private Button mButtonSubmitNo;
+    private ImageView mButtonSubmitYes;
+    private ImageView mButtonSubmitNo;
     private String mObjectId;
+    private String mImageUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +61,7 @@ public class GameActivity extends AppCompatActivity {
                 try {
                     String imageUri = response.getJSONObject("question").getString("image_uri");
                     Picasso.get().load(imageUri).into(mImageViewPlayGuess);
+                    mImageUri = imageUri;
                     mObjectId = response.getJSONObject("question").getString("_id");
                 } catch (JSONException e) {
                 }
@@ -83,6 +84,7 @@ public class GameActivity extends AppCompatActivity {
                     Boolean result = response.getBoolean("result");
                     Intent intent = new Intent(getApplicationContext(), GameResultActivity.class);
                     intent.putExtra("RESULT", result);
+                    intent.putExtra("IMAGE_URI", mImageUri);
                     startActivity(intent);;
                 } catch (JSONException e) {
                 }
@@ -92,5 +94,12 @@ public class GameActivity extends AppCompatActivity {
             public void onError(VolleyError error) {
             }
         });
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fetchQuestion();
     }
 }
