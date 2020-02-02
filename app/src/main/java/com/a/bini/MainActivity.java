@@ -40,9 +40,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void goToSnapActivity() {
         Intent intent = new Intent(this, SnapActivity.class);
-//        EditText editText = (EditText) findViewById(R.id.editText);
-//        String message = editText.getText().toString();
-//        intent.putExtra(EXTRA_MESSAGE, message);
         startActivity(intent);
     }
 

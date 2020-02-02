@@ -3,7 +3,9 @@ package com.a.bini;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -17,11 +19,15 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Base64;
+import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Surface;
@@ -31,25 +37,50 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.google.gson.JsonObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class SnapActivity extends AppCompatActivity {
 
     private Button btnCapture;
+    private Button btnGallery;
     private TextureView textureView;
+    private final int IMG_REQUEST =1;
+    private Bitmap bitmap;
 
     //Check state orientation of output image
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
@@ -104,14 +135,71 @@ public class SnapActivity extends AppCompatActivity {
         if(textureView != null);
             textureView.setSurfaceTextureListener(textureListener);
         btnCapture = (Button)findViewById(R.id.captureBtn);
+        btnGallery = (Button)findViewById(R.id.galleryBtn);
         btnCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 takePicture();
             }
         });
+
+        btnGallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectGalleryImage();
+            }
+        });
     }
 
+    private void selectGalleryImage() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, IMG_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if( requestCode == IMG_REQUEST &&  resultCode == RESULT_OK && data != null ) {
+            Uri path = data.getData();
+            try {
+                File imgFile = new File(path.toString());
+                uploadImage(imgFile);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Toast.makeText(SnapActivity.this, "Saved "+path.getPath(), Toast.LENGTH_SHORT).show();
+
+        }
+    }
+
+    private void uploadImage(File file) {
+        final RequestBody requestBody = RequestBody.create(MediaType.parse("image/*"), file);
+        MultipartBody.Part parts = MultipartBody.Part.createFormData("file", file.getName(),requestBody);
+
+        RequestBody someData = RequestBody.create(MediaType.parse("text/plain"), "This is new image");
+
+        Retrofit retrofit = NetworkClient.getRetrofit();
+        UploadApis uploadApis = retrofit.create(UploadApis.class);
+        Call call = uploadApis.uploadImage(parts, someData);
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                Log.d("res", "success");
+            }
+
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Log.d("res", "Error");
+            }
+        });
+
+
+    }
+
+
+    //TAKING PICTURE STUFF
     private void takePicture() {
         if(cameraDevice == null)
             return;
@@ -131,6 +219,7 @@ public class SnapActivity extends AppCompatActivity {
                 width = jpegSizes[0].getWidth();
                 height = jpegSizes[0].getHeight();
             }
+
             final ImageReader reader = ImageReader.newInstance(width,height,ImageFormat.JPEG,1);
             List<Surface> outputSurface = new ArrayList<>(2);
             outputSurface.add(reader.getSurface());
@@ -172,6 +261,7 @@ public class SnapActivity extends AppCompatActivity {
                         }
                     }
                 }
+
                 private void save(byte[] bytes) throws IOException {
                     OutputStream outputStream = null;
                     try{
@@ -182,6 +272,7 @@ public class SnapActivity extends AppCompatActivity {
                             outputStream.close();
                     }
                 }
+
             };
 
             reader.setOnImageAvailableListener(readerListener,mBackgroundHandler);
