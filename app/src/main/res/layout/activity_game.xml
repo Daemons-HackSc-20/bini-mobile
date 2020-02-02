@@ -7,6 +7,16 @@
     tools:context=".GameActivity">
 
     <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/doyouthink_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.052" />
+
+    <ImageView
         android:id="@+id/img_play_guess"
         android:layout_width="300dp"
         android:layout_height="300dp"
@@ -27,19 +37,19 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.811">
 
-        <Button
-            android:id="@+id/btn_submit_answer_yes"
-            android:text="YES"
-            android:layout_alignParentLeft="true"
-            android:layout_width="80dp"
-            android:layout_height="100dp" />
-
-        <Button
+        <ImageView
             android:id="@+id/btn_submit_answer_no"
-            android:text="NO"
+            android:src="@mipmap/x"
+            android:layout_alignParentLeft="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/btn_submit_answer_yes"
+            android:src="@mipmap/o"
             android:layout_alignParentRight="true"
-            android:layout_width="80dp"
-            android:layout_height="100dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginRight="0dp" />
 
     </RelativeLayout>

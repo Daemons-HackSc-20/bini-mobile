@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -19,8 +18,8 @@ import org.json.JSONObject;
 
 public class GameActivity extends AppCompatActivity {
     private ImageView mImageViewPlayGuess;
-    private Button mButtonSubmitYes;
-    private Button mButtonSubmitNo;
+    private ImageView mButtonSubmitYes;
+    private ImageView mButtonSubmitNo;
     private String mObjectId;
 
     @Override
