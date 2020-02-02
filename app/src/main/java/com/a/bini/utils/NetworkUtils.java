@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NetworkUtils {
-    private static final String DEFAULT_HOST = "http://10.26.83.255:3001/api/v1";
+    private static final String DEFAULT_HOST = "http://35.236.71.139/api/v1";
 
     public static void fetchRandomQuestion(Context context, final Callbacks.VolleyCallback callback) {
         RequestQueue queue = Volley.newRequestQueue(context);
