@@ -22,19 +22,18 @@
         >
         <Button
             android:id="@+id/captureBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            android:text="Capture"
+            android:layout_width="120dp"
+            android:layout_height="80dp"
+            android:background="@drawable/cap"
             android:layout_marginRight="200px"
              />
 
         <Button
             android:id="@+id/galleryBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            android:text="Gallery" />
+            android:layout_width="120dp"
+            android:layout_height="80dp"
+            android:background="@drawable/gal"
+             />
 
     </LinearLayout>
 
